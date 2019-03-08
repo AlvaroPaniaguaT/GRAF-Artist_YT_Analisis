@@ -50,9 +50,12 @@ class AllmusicSpiderSpider(scrapy.Spider):
             try:
                 feat_artist_id = response.selector.xpath('//div[@class="title"]/span/a/@href').get()
                 feat_artist_id = feat_artist_id.rsplit('-', 1)[-1]
+                feat_artist_name = response.selector.xpath('//tbody/tr/td/div/span/a/text()').get()
+
             except Exception as e:
                 continue
             output_item['feat_artist_id'] = feat_artist_id
+            output_item['feat_artist_name'] = feat_artist_name
             yield output_item
             
 

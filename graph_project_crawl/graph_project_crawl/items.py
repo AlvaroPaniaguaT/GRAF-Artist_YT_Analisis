@@ -14,4 +14,5 @@ class GraphProjectCrawlItem(scrapy.Item):
     artist_id = scrapy.Field()
     song = scrapy.Field()
     feat_artist_id = scrapy.Field()
+    feat_artist_name = scrapy.Field()
 
