@@ -107,11 +107,20 @@ class AllmusicSpider(scrapy.Spider):
             output_item['feat_artist_name'] = feat_artist_name
             yield output_item
 
+def calc_YT_quota(start_point, end_point):
+    num_requests = int(end_point) - int(start_point)
+    search_quota = 100 * num_requests
+    channels_quota = 7 * num_requests
+    total_quota = search_quota + channels_quota
+    print("Cuota total de peticiones al API de YT --> %s" % total_quota)
+    print("Número de cuentas necesarias para hacer la ingesta --> %s" % round(total_quota/10000, 0))
+
 
 if __name__ == "__main__":
     # Number of artists to use to extract YT channels data.
-    num_artist = input('Indica el número de artistas para sacar sus datos --> ')
-    
+    start_point = input('Indica el índice de inicio en la lista de artistas para sacar sus datos --> ')
+    end_point = input('Indica el índice de fin en la lista de artistas para sacar sus datos --> ')
+    calc_YT_quota(start_point, end_point)
     # Read from console YT API KEYS to use
     list_YT_keys = input('Inserta una lista de claves de YT (separadas por coma) --> ')
     list_YT_keys = list_YT_keys.split(',')
@@ -121,8 +130,8 @@ if __name__ == "__main__":
     artist_list = get_artist_list('https://www.todomusica.org/listado-artistas.shtml')
 
     # Filter list 0 to num artist
-    filtered_list = artist_list[0:int(num_artist)]
-    
+    filtered_list = artist_list[int(start_point):int(end_point)]
+    print(filtered_list)
 
     # Authenticate on YOUTUBE API
     youtube = authenticate_on_youtube()
@@ -139,7 +148,7 @@ if __name__ == "__main__":
 
     # Crawl allmusic and output on Data.json
     process = CrawlerProcess({
-        'FEED_URI': '50_First_Artists.json'
+        'FEED_URI': '301_550_First_Artists.json'
     })
     process.crawl(AllmusicSpider, df_results)
     process.start()
