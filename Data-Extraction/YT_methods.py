@@ -26,17 +26,13 @@ def authenticate_on_youtube():
     return youtube
 
 
-def extract_channels_id(artist_list, youtube, tmp_filepath):
+def extract_channels_id(artist_list, youtube):
     '''
         This functions extracts channels names for the artist_list from
         Youtube and saves them in channels.txt file
     '''
-    channels_name_list = list()
-    channels_id_list = list()
-    channels_file = open(tmp_filepath, 'w', encoding='utf-8')
     for artist in artist_list:  
         print('Requesting channel for --> %s' % (artist))
-
         try:
             channel_id, channel_name = search_channel(artist, youtube)
         except Exception as e:
@@ -44,19 +40,13 @@ def extract_channels_id(artist_list, youtube, tmp_filepath):
             youtube = authenticate_on_youtube()
             channel_id, channel_name = search_channel(artist, youtube)
 
-        channels_name_list.append(channel_name)
-        channels_id_list.append(channel_id)
-        print(len(channels_name_list), len(channels_id_list))
-        channels_file.write(channel_name)
-        channels_file.write('\n')
-        sleep_random_time()
-    channels_file.close()
-    return channels_name_list, channels_id_list, youtube
+
+        yield channel_name, channel_id, artist, youtube
 
 ## Gets the most viewed channel for a given artist
 def search_channel(artist, youtube):
     
-    request = youtube.search().list(q=artist.upper(), part='snippet', 
+    request = youtube.search().list(q=artist.lower() + 'VEVO', part='snippet', 
                                     type='channel', maxResults=1, 
                                     order='viewCount').execute()
     
@@ -76,14 +66,28 @@ def sleep_random_time():
     time.sleep(rand_secs)
 
 # This function extracts channel data from different endpoints and stores in pandas dataframe object
-def get_channel_data(row, youtube):
-    channel_id = row['channel_id']
-    # Request quota = 7
-    response = youtube.channels().list(id=channel_id,
+def get_channel_data(row, youtube, col_selector):
+    channel_id = row[col_selector]
+    print("Getting channel data for ID --> " + channel_id)
+    try:
+        response = youtube.channels().list(id=channel_id,
                                        part='snippet,contentDetails,statistics').execute()
-
+    except Exception as e:
+        youtube = authenticate_on_youtube()
+        response = youtube.channels().list(id=channel_id,
+                                       part='snippet,contentDetails,statistics').execute()
     # Store some data from response
-    row['view_count'] = response['items'][0]['statistics']['viewCount']
-    row['subs_count'] = response['items'][0]['statistics']['subscriberCount']
+    if response['pageInfo']['totalResults'] != 0:
+        row['view_count'] = response['items'][0]['statistics']['viewCount']
+        row['subs_count'] = response['items'][0]['statistics']['subscriberCount']
 
-    return row
+        return row
+    else:
+        return None
+
+def calc_YT_quota(num_requests):
+    search_quota = 100 * num_requests
+    channels_quota = 7 * num_requests
+    total_quota = search_quota + channels_quota
+    print("Cuota total de peticiones al API de YT --> %s" % total_quota)
+    print("Número de cuentas necesarias para hacer la ingesta --> %s" % round(total_quota/10000, 0))
