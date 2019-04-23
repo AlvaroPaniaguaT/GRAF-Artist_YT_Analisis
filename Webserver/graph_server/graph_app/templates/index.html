@@ -1,28 +1,46 @@
+{% extends './base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Graph Artists Analysis</title>
-    <script
-  src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-  integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
-  crossorigin="anonymous"></script>
-    <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script src="{% static './js/d3-main-page.js' %}" type='text/javascript'></script>
-    <link rel="stylesheet" type="text/css" href="{% static './css/main.css' %}"></link>
-</head>
-<body>
-    <nav>
-        <ul>
-            <li class="home"><a href="#">Grafo Completo</a></li>
-            <li class="tutorials"><a class="active" href="#">Tutorials</a></li>
-            <li class="about"><a href="#">About</a></li>
-            <li class="news"><a href="#">Newsletter</a></li>
-            <li class="contact"><a href="#">Contact</a></li>
-        </ul>
-    </nav>
-    <div id="content">
-        <svg width="1920" height="1080"></svg>
-    </div>
-</body>
-</html>
+
+{% block explaining %}
+<br>
+<h3>Grafo inicial</h3>
+
+<p>Este grafo es un grafo inicial con datos de la página <a href=http://www.metrolyrics.com>MetroLyrics</a> la cual contiene
+un listado de artistas ordenado alfabéticamente.</p>
+
+<p>La representación de este grafo tiene las siguientes características:</p>
+<ol>
+    <li>El tamaño de los nodos representa el logarítmo decimal de las tocadas almacenadas en Youtube</li>
+    <li>El color de los nodos depende de su género musical</li>
+</ol>
+<h4>Métricas del grafo inicial</h4>
+
+<p>
+    Existen algunas métricas interesantes a obtener sobre este grafo inicial, estas métricas se representan a continuación.
+</p>
+
+<table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Conexo</th>
+        <th scope="col">Densidad</th>
+        <th scope="col">Longitud del subgrafo</th>
+        <th scope="col">Diametro</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{is_connected}}</td>
+        <td>{{density}}</td>
+        <td>{{subgraph_length}}</td>
+        <td>{{diameter}}</td>
+      </tr>
+    </tbody>
+</table>
+
+{% endblock %}
+{% block graph_scripts %}
+
+<script src="{% static './js/d3-main-page.js' %}" type='text/javascript'></script>
+
+{% endblock %}

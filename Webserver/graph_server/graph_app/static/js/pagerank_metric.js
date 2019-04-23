@@ -1,4 +1,3 @@
-
 function representGraph(){
     var svg = d3.select("svg");
 
@@ -9,32 +8,27 @@ function representGraph(){
     var width = +svg.attr("width");
     var height = +svg.attr("height");
 
-    // Creates simulation D3 object
     var simulation = d3.forceSimulation()
-                       .force("link", d3.forceLink().id(function(d) { return d.id; }))
-                       .force("charge", d3.forceManyBody().strength([-150]).distanceMax([500]))
-                       .force("collide", d3.forceCollide().radius(function (d) {
-                            if ((d.weight != undefined) & (d.weight != 0)){
-                                return Math.log10(d.weight);
-                            }else{
-                                return 1;
-                            }
-                       }))
-                       .force("center", d3.forceCenter(width / 2, height / 2));
+        .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(12))
+        .force("charge", d3.forceManyBody().strength([-150]).distanceMax([500]))
+        .force("collide", d3.forceCollide().radius(function (d) {
+            return calculateSize(d)
+        }))
+        .force("center", d3.forceCenter(width / 2, height / 2));
 
     // Add divs to append text on mouse over
     var div = d3.select("body")
-                .append("div")
-                .attr("class", "tooltip")
-                .style("opacity", 0);
+        .append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
     
     // Define a color scheme
     var color = d3.scaleOrdinal(d3.schemeAccent);
     
-    d3.json('./API/get_main').then(function(data, error){
+    d3.json('/API/pagerank').then(function(data, error){
         if (error) throw error;
 
-        // Make object of all neighboring nodes.
+
         var linkedByIndex = {};
         data.links.forEach(function(d) {
             linkedByIndex[d.target + ',' + d.target] = 1;
@@ -46,12 +40,11 @@ function representGraph(){
             return linkedByIndex[a.id + ',' + b.id];
         }
 
-        // Draw lines for the links
         var link = container.append("g")
               .attr("class", "links")
               .selectAll("line")
               .data(data.links)
-              .enter().append("line").attr("class", "link")
+              .enter().append("line").attr("class", "link");
 
         var toggle = 0;
         var node = container.append("g")
@@ -61,31 +54,27 @@ function representGraph(){
                       .enter().append("g")
                       .on('click', function(d, i) {
 
-                      if (toggle == 0) {
-                          // Ternary operator restyles links and nodes if they are adjacent.
-                          d3.selectAll('.link').style('stroke-opacity', function (l) {
-                              return l.target == d || l.source == d ? 1 : 0.1;
-                          });
-                          d3.selectAll('.node').style('opacity', function (n) {
-                              return neighboring(d, n) ? 1 : 0.1;
-                          });
-                          d3.select(this).style('opacity', 1);
-                          toggle = 1;
-                      }else {
-                          // Restore nodes and links to normal opacity.
-                          d3.selectAll('.link').style('stroke-opacity', '0.6');
-                          d3.selectAll('.node').style('opacity', '1');
-                          toggle = 0;
-                      }
+                        if (toggle == 0) {
+                            // Ternary operator restyles links and nodes if they are adjacent.
+                            d3.selectAll('.link').style('stroke-opacity', function (l) {
+                                return l.target == d || l.source == d ? 1 : 0.1;
+                            });
+                            d3.selectAll('.node').style('opacity', function (n) {
+                                return neighboring(d, n) ? 1 : 0.1;
+                            });
+                            d3.select(this).style('opacity', 1);
+                            toggle = 1;
+                        }else {
+                            // Restore nodes and links to normal opacity.
+                            d3.selectAll('.link').style('stroke-opacity', '0.6');
+                            d3.selectAll('.node').style('opacity', '1');
+                            toggle = 0;
+                        }
                     });
 
         var circles = node.append("circle").attr("class", "node")
                 .attr("r", function(d){
-                    if ((d.weight != undefined) & (d.weight != 0)){
-                        return Math.log10(d.weight);
-                    }else{
-                        return 3;
-                    }
+                    return 600*d.page_rank;
                 })
                 .attr("fill", function (d) {
                     // Fill node by genre attr
@@ -95,7 +84,7 @@ function representGraph(){
                     div.transition()
                         .duration(200)
                         .style("opacity", .9);
-                    div.html(d['id'])
+                    div.html(d['id'], d['eigen_centrality'])
                         .style("left", (d3.event.pageX) + "px")
                         .style("top", (d3.event.pageY) + "px")
                         .style('background', colorForType(d));
@@ -105,7 +94,7 @@ function representGraph(){
                         .duration(500)
                         .style("opacity", 0);
             });;
-
+        
         // Uncomment to show all texts of nodes      
         //var labels = node.append("text")
         //        .text(function(d){
@@ -132,9 +121,9 @@ function representGraph(){
                 .attr("transform", function(d) {
                   return "translate(" + d.x + "," + d.y + ")";
                 })
-          }
+        }
 
-          var drag_handler = d3.drag()
+        var drag_handler = d3.drag()
             .on("start", drag_start)
             .on("drag", drag_drag)
             .on("end", drag_end);
@@ -157,8 +146,15 @@ function representGraph(){
             d.fx = null;
             d.fy = null;
         }
-
     });
+
+    function calculateSize(d) {
+        switch (d['type']) {
+            case 'artist': return popScale(d['popularity']);
+            case 'track': return durationScale(d['duration'])
+            default: return 5;
+        }
+    }
 
     // Fills node depending on node genre
     function colorForType(d) {
@@ -178,11 +174,11 @@ function representGraph(){
 
         container.attr("transform", "translate(" + d3.event.transform.x + ", " + d3.event.transform.y + ") scale(" + d3.event.transform.k + ")");
     }
-
-    
 }
 
+
 function responsivefy(svg) {
+    console.log("Llamando")
     // get container + svg aspect ratio
     var container = d3.select(svg.node().parentNode),
         width = parseInt(svg.style("width")),

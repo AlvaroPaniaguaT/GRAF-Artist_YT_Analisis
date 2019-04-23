@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Graph Artists Analysis</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{% static './css/main.css' %}"></link>
+    <link rel="stylesheet" type="text/css" href="{% static './css/graph.css' %}"></link>
+</head>
+<body onload="representGraph()">
+    <!-- This is the navigation bar on the page -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">
+          <img src="{% static 'images/logo.png' %}" class="img-fluid rounded" alt="Sample photo" style="width: 100px; height: 100px;">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+              <a class="nav-link nav-item" href="/">Home <span class="sr-only">(current)</span></a>
+              <a class="nav-link nav-item" href="/ev_centrality">Eigenvector Centrality</a>
+              <a class="nav-link nav-item" href="/pagerank">Page Rank Centrality</a>
+          </ul>
+        </div>
+      </nav>
+      <div class="container-fluid h-100">
+        <div class="row justify-content-center h-100 full-height">
+            <div class="col-4 hidden-md-down">      
+              {% block explaining %}
+              {% endblock %}
+            </div>
+            <div class="col-10 col-sm-10 col-md-10 col-lg-8 col-xl-8 ">
+                <svg></svg>
+            </div>
+        </div>
+      </div>
+        {% block graph_scripts %}
+        {% endblock %}
+
+</body>
+</html>
