@@ -10,6 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="//d3js.org/d3-scale-chromatic.v0.3.min.js"></script>
     <link rel="stylesheet" type="text/css" href="{% static './css/main.css' %}"></link>
     <link rel="stylesheet" type="text/css" href="{% static './css/graph.css' %}"></link>
 </head>
@@ -27,20 +28,19 @@
               <a class="nav-link nav-item" href="/">Home <span class="sr-only">(current)</span></a>
               <a class="nav-link nav-item" href="/ev_centrality">Eigenvector Centrality</a>
               <a class="nav-link nav-item" href="/pagerank">Page Rank Centrality</a>
+              <a class="nav-link nav-item" href="/modularity">Communities</a>
           </ul>
         </div>
       </nav>
-      <div class="container-fluid h-100">
-        <div class="row justify-content-center h-100 full-height">
-            <div class="col-4 hidden-md-down">      
+        <div class="row justify-content-center">
+            <div class="col-4 hidden-md-down" id="scrollable">      
               {% block explaining %}
               {% endblock %}
             </div>
-            <div class="col-10 col-sm-10 col-md-10 col-lg-8 col-xl-8 ">
+            <div class="col-8 col-xl-8 ">
                 <svg></svg>
             </div>
         </div>
-      </div>
         {% block graph_scripts %}
         {% endblock %}
 

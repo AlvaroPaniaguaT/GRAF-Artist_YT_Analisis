@@ -10,6 +10,7 @@ import os
 import networkx as nx
 import matplotlib.pyplot as plt
 from networkx.readwrite import json_graph
+from networkx.algorithms.community import greedy_modularity_communities
 import pandas as pd
 
 
@@ -53,6 +54,10 @@ def page_rank_view(request):
     """
     return render(request, 'page_rank.html')
 
+
+def modularity_view(request):
+
+    return render(request, 'modularity.html')
 
 def get_main_graph(request):
     """ API Endpoint to get the initial graph JSON
@@ -107,6 +112,26 @@ def calculate_pagerank(request):
             data['nodes'][index]['page_rank'] = page_rank[node['id']]
 
         index += 1
+
+    return JsonResponse(data, safe=False)
+
+
+def calculate_modularity(request):
+    logging.info('Calculating modularity')
+
+    G = generate_graph()
+    data = generate_d3_format(G)
+
+    modularity = list(greedy_modularity_communities(G))
+    logging.info(len(modularity))
+    index = 0
+    while (index < len(modularity)):
+        for cluster_node in modularity[index]:
+            for position, node in enumerate(data['nodes']):
+                if cluster_node == node['id']:
+                    data['nodes'][position]['cluster'] = index
+        
+        index +=1
 
     return JsonResponse(data, safe=False)
 

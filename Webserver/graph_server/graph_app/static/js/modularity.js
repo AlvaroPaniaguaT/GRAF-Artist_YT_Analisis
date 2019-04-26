@@ -1,4 +1,30 @@
+
 function representGraph(){
+
+    var colorCodes = {
+        0: '#e6194b', 
+        1: '#3cb44b', 
+        2: '#ffe119', 
+        3: '#4363d8', 
+        4: '#f58231', 
+        5: '#911eb4', 
+        6: '#46f0f0', 
+        7: '#f032e6', 
+        8: '#bcf60c', 
+        9: '#fabebe', 
+        10: '#008080', 
+        11: '#e6beff', 
+        12: '#9a6324', 
+        13: '#fffac8', 
+        14: '#800000', 
+        15: '#aaffc3', 
+        16: '#808000', 
+        17: '#ffd8b1', 
+        18: '#000075', 
+        19: '#808080', 
+        20: '#ffffff', 
+        21: '#000000'
+    }
     var svg = d3.select("svg");
 
     svg.call(d3.zoom().on("zoom", zoomed)).call(responsivefy);
@@ -11,13 +37,9 @@ function representGraph(){
     // Creates simulation D3 object
     var simulation = d3.forceSimulation()
                        .force("link", d3.forceLink().id(function(d) { return d.id; }))
-                       .force("charge", d3.forceManyBody().strength([-150]).distanceMax([500]))
+                       .force("charge", d3.forceManyBody().strength([-50]).distanceMax([500]))
                        .force("collide", d3.forceCollide().radius(function (d) {
-                            if ((d.weight != undefined) & (d.weight != 0)){
-                                return Math.log10(d.weight);
-                            }else{
-                                return 1;
-                            }
+                            return 10;
                        }))
                        .force("center", d3.forceCenter(width / 2, height / 2));
 
@@ -28,9 +50,9 @@ function representGraph(){
                 .style("opacity", 0);
     
     // Define a color scheme
-    var color = d3.scaleOrdinal(d3.schemeAccent);
+    var color = d3.scaleOrdinal(d3.schemePaired);
     
-    d3.json('./API/get_main').then(function(data, error){
+    d3.json('/API/get_modularity').then(function(data, error){
         if (error) throw error;
 
         // Make object of all neighboring nodes.
@@ -80,24 +102,20 @@ function representGraph(){
 
         var circles = node.append("circle").attr("class", "node")
                 .attr("r", function(d){
-                    if ((d.weight != undefined) & (d.weight != 0)){
-                        return Math.log10(d.weight);
-                    }else{
-                        return 3;
-                    }
+                    return 5;
                 })
                 .attr("fill", function (d) {
                     // Fill node by genre attr
-                    return colorForType(d)
+                    return colorCodes[d['cluster']]
                 })
                 .on("mouseover", function(d) {
                     div.transition()
                         .duration(200)
                         .style("opacity", .9);
-                    div.html(d['id'])
+                    div.html(d['cluster'])
                         .style("left", (d3.event.pageX) + "px")
                         .style("top", (d3.event.pageY) + "px")
-                        .style('background', colorForType(d));
+                        .style('background', colorCodes[d['cluster']]);
                 })
                 .on("mouseout", function(d) {
                     div.transition()
@@ -159,19 +177,6 @@ function representGraph(){
 
     });
 
-    // Fills node depending on node genre
-    function colorForType(d) {
-        switch (d["genre"]) {
-            case 'Rock': return color(0);
-            case 'Country': return color(1);
-            case 'Jazz': return color(2);
-            case 'Indie': return color(3);
-            case 'Pop': return color(4);
-            case 'Hip-Hop': return color(5);
-            case 'Other': return color(6);
-            default: return color(6);
-        }
-    }
 
     function zoomed() {
 

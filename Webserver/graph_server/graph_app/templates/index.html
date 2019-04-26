@@ -2,17 +2,30 @@
 {% load static %}
 
 {% block explaining %}
-<br>
+
 <h3>Grafo inicial</h3>
 
-<p>Este grafo es un grafo inicial con datos de la página <a href=http://www.metrolyrics.com>MetroLyrics</a> la cual contiene
-un listado de artistas ordenado alfabéticamente.</p>
+<p>
+  Este grafo es un grafo inicial con datos de la página <a href=http://www.metrolyrics.com>MetroLyrics</a> la cual contiene
+  un listado de artistas ordenado alfabéticamente. Se han relacionado los artistas mediante las colaboraciones <em>featuring</em>
+  en canciones. Además a cada artista se le ha añadido el número de reproducciones de su canal de Youtube.
+</p>
 
 <p>La representación de este grafo tiene las siguientes características:</p>
 <ol>
-    <li>El tamaño de los nodos representa el logarítmo decimal de las tocadas almacenadas en Youtube</li>
-    <li>El color de los nodos depende de su género musical</li>
+    <li>El tamaño de los nodos representa el logarítmo decimal de las reproducciones almacenadas en Youtube, se ha aplicado
+      el logarítmo debido a que el número de reproducciones para algunos artistas era alto y no permitían visualizar correctamente el grafo.
+    </li>
+    <li>El color de los nodos depende de su género musical.</li>
 </ol>
+
+<h4>Objetivo</h4>
+
+<p>
+  El objetivo principal es obtener algunas medidas de análisis de grafos que nos permitan saber en nuestra red cuales son los nodos más
+  relevantes. Para ello hemos usado principalmente 2 medidas de centralidad <em><a href="/ev_centrality">eigenvector</a></em> y <em><a href="/pagerank">pagerank</a></em>.
+</p>
+
 <h4>Métricas del grafo inicial</h4>
 
 <p>
@@ -37,6 +50,29 @@ un listado de artistas ordenado alfabéticamente.</p>
       </tr>
     </tbody>
 </table>
+
+<p>
+    A continuación se explicarán cada una de las metricas de la tabla:
+  </p>
+  <ol>
+    <li>
+      Conexo: El grafo no es conexo, como se puede observar en la visualización a la derecha tenemos 4 subgrafos no conexos.
+    </li>
+    <li>
+      Densidad: La métrica de densidad indica si el número de arístas del grafo es máximo o cercano al máximo, en este caso tenemos una medida baja 
+      por lo tanto nos indica que los nodos del grafo tienen pocas arístas, es decir, todos los nodos no están conectados entre sí. La siguiente imagen 
+      representa mejor la explicación dada.
+
+      <img src="{% static 'images/completegraph.png' %}" class="img-fluid rounded" alt="Sample photo" style="width: 400px; height: 120px;">
+    </li>
+    <li>
+      Longitud del subgrafo: Número de nodos que forman el subgrafo conexo. Nos permite saber cuántos nodos hay conectados entre sí, es decir, que desde un
+      nodo del subgrafo puedo llegar a cualquier otro punto del subgrafo por al menos un camino.
+    </li>
+    <li>
+      Diametro: Es la distancia máxima entre dos nodos del subgrafo.
+    </li>
+  </ol>
 
 {% endblock %}
 {% block graph_scripts %}

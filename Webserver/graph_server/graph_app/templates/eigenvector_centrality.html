@@ -1,5 +1,25 @@
 {% extends './base.html' %}
 {% load static %}
+
+{% block explaining %}
+<h3>Eigenvector centrality</h3>
+<p>
+    Esta medida nos permite decir que un vertice es importante si sus vecinos son importantes por sí mismos. 
+    Es la medida de la influencia de un nodo en la red. Esta metrica nos da una metrica de la importancia de los artistas.
+    Se prevee que el resultado sea que aquellos artistas conectados con nodos con gran cantidad de conexiones serán más importantes.
+</p>
+
+<img src="{% static 'images/Ego-Eminem.png' %}" class="img-fluid rounded" alt="Sample photo" style="width: 400px; height: 400px;">
+
+<p>
+    Al ver la red egocentrica de Eminem podemos observar que tiene bastantes conexiones a nodos relevantes de por sí lo que nos devuelve que
+    el artista eminem es importante en la red. Si observamos las redes egocentricas de los nodos de mayor tamaño se puede comprobar que todos tienen 
+    un gran número de conexiones a nodos relevantes de la red.
+</p>
+{% endblock %}
+
+
+
 {% block graph_scripts %}
 
 <script src="{% static './js/eigenvector_centrality.js' %}" type='text/javascript'></script>

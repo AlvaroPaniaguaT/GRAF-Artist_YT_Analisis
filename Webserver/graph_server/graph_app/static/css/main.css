@@ -14,3 +14,12 @@ svg{
   width: 100%;
   height: 100%;
 }
+
+#scrollable{
+  height: 80vh;
+  overflow-y: scroll;
+}
+
+.row{
+  width: 100%;
+}
